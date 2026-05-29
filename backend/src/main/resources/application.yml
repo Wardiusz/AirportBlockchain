@@ -1,0 +1,27 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+fabric:
+  # Root of fabric-samples (contains test-network/). Override via FABRIC_SAMPLES_DIR or backend/.env
+  samplesDir: ${FABRIC_SAMPLES_DIR:F:/STUDIA/AirportBlockchain/network/fabric-samples}
+  channel: ${FABRIC_CHANNEL:airportchannel}
+  chaincode: ${FABRIC_CHAINCODE:airport-cc}
+
+  # Ścieżki do certyfikatów Org1 (budowane na podstawie samplesDir)
+  mspId: Org1MSP
+  cryptoPath: ${fabric.samplesDir}/test-network/organizations/peerOrganizations/org1.example.com
+  certPath: ${fabric.cryptoPath}/users/User1@org1.example.com/msp/signcerts/cert.pem
+  keyPath: ${fabric.cryptoPath}/users/User1@org1.example.com/msp/keystore
+  tlsCertPath: ${fabric.cryptoPath}/peers/peer0.org1.example.com/tls/ca.crt
+
+  # Adres peera
+  peerEndpoint: localhost:7051
+  peerHostname: peer0.org1.example.com
+
+spring:
+  application:
+    name: airport-blockchain-backend
+
+# Loads backend/.env when the app is started from the backend/ directory (IDE, mvn spring-boot:run)
+springdotenv:
+  directory: .

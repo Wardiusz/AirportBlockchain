@@ -1,0 +1,107 @@
+---
+# ══════════════════════════════════════════════════════════════
+#  Connection Profile — Airport Blockchain
+#  Używany przez Spring Boot (Fabric Gateway SDK) do połączenia
+#  z siecią Hyperledger Fabric (test-network).
+#
+#  Ścieżki certyfikatów są względne do ~/fabric-samples/test-network
+#  Podmień HOME_DIR na absolutną ścieżkę swojego użytkownika,
+#  np. /home/jan lub /Users/jan (macOS)
+# ══════════════════════════════════════════════════════════════
+
+name: airport-network
+version: "1.0"
+description: Airport Blockchain Network - Connection Profile
+
+client:
+  organization: Org1
+  connection:
+    timeout:
+      peer:
+        endorser: 300
+      orderer: 300
+
+# ── Kanał ─────────────────────────────────────────────────────
+channels:
+  airportchannel:
+    orderers:
+      - orderer.example.com
+    peers:
+      peer0.org1.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.org2.example.com:
+        endorsingPeer: true
+        chaincodeQuery: false
+        ledgerQuery: true
+        eventSource: false
+
+# ── Organizacje ───────────────────────────────────────────────
+organizations:
+  Org1:
+    mspid: Org1MSP
+    peers:
+      - peer0.org1.example.com
+    certificateAuthorities:
+      - ca.org1.example.com
+    # Użytkownik aplikacji (zarejestrowany przez CA)
+    adminPrivateKey:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/keystore/priv_sk
+    signedCert:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp/signcerts/Admin@org1.example.com-cert.pem
+
+  Org2:
+    mspid: Org2MSP
+    peers:
+      - peer0.org2.example.com
+    certificateAuthorities:
+      - ca.org2.example.com
+
+# ── Orderer ───────────────────────────────────────────────────
+orderers:
+  orderer.example.com:
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer.example.com
+      hostnameOverride: orderer.example.com
+      grpc-max-send-message-length: 15
+    tlsCACerts:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+
+# ── Peery ────────────────────────────────────────────────────
+peers:
+  peer0.org1.example.com:
+    url: grpcs://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.org1.example.com
+      hostnameOverride: peer0.org1.example.com
+    tlsCACerts:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt
+
+  peer0.org2.example.com:
+    url: grpcs://localhost:9051
+    grpcOptions:
+      ssl-target-name-override: peer0.org2.example.com
+      hostnameOverride: peer0.org2.example.com
+    tlsCACerts:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+
+# ── Certificate Authorities ───────────────────────────────────
+certificateAuthorities:
+  ca.org1.example.com:
+    url: https://localhost:7054
+    caName: ca-org1
+    tlsCACerts:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org1.example.com/ca/ca.org1.example.com-cert.pem
+    httpOptions:
+      verify: false
+
+  ca.org2.example.com:
+    url: https://localhost:8054
+    caName: ca-org2
+    tlsCACerts:
+      path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org2.example.com/ca/ca.org2.example.com-cert.pem
+    httpOptions:
+      verify: false
