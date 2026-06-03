@@ -7,18 +7,19 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="chaincode" />
+        <module name="AirportBlockchain-backend" />
         <module name="backend" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="airport-cc" target="25" />
       <module name="AirportBlockchain" target="25" />
+      <module name="chaincode" target="25" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="AirportBlockchain" options="-parameters" />
+      <module name="AirportBlockchain-backend" options="-parameters" />
       <module name="backend" options="-parameters" />
     </option>
   </component>
