@@ -79,21 +79,10 @@ cd "$FABRIC_DIR/test-network"
 echo -e "${GREEN}✓ Sieć uruchomiona, kanał 'airportchannel' utworzony${NC}"
 
 # ── 5. Deploy chaincode ───────────────────────────────────────
-echo -e "\n${YELLOW}[5/5] Wdrażam chaincode 'airport-cc'...${NC}"
-
-# Pobierz obraz fabric-javaenv jesli nie istnieje
-if ! docker image inspect hyperledger/fabric-javaenv:2.5 &>/dev/null; then
-  echo -e "  Pobieram obraz hyperledger/fabric-javaenv:2.5..."
-  docker pull hyperledger/fabric-javaenv:2.5
-  echo -e "${GREEN}OK Obraz fabric-javaenv:2.5 pobrany${NC}"
-else
-  echo -e "${GREEN}OK Obraz fabric-javaenv:2.5 juz istnieje${NC}"
-fi
-
-./network.sh deployCC \
+echo -e "\n${YELLOW}[5/5] Wdrazam chaincode 'airport-cc' jako serwis (CCaaS)...${NC}"
+./network.sh deployCCAAS \
   -ccn airport-cc \
   -ccp "$CHAINCODE_DEST" \
-  -ccl java \
   -c airportchannel
 
 echo -e "\n${GREEN}========================================${NC}"
