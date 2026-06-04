@@ -1,103 +1,69 @@
 package com.airportblockchain.backend.controller;
 
-import com.airportblockchain.backend.model.FlightData;
+import com.airportblockchain.backend.model.CreateFlightRequest;
+import com.airportblockchain.backend.model.UpdateGateRequest;
+import com.airportblockchain.backend.model.UpdateStatusRequest;
 import com.airportblockchain.backend.service.FlightService;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * FlightController — REST API dla danych lotów.
- *
- * GET    /api/flights          → wszystkie loty
- * GET    /api/flights/{id}     → pojedynczy lot
- * POST   /api/flights          → nowy lot
- * PATCH  /api/flights/{id}/status → zmiana statusu
- * PATCH  /api/flights/{id}/gate   → zmiana bramki
- * GET    /api/flights/{id}/history → historia zmian
+ * GET    /api/flights              → AIRLINE, HANDLER, ADMIN
+ * GET    /api/flights/{id}         → AIRLINE, HANDLER, ADMIN
+ * POST   /api/flights              → AIRLINE, ADMIN
+ * PATCH  /api/flights/{id}/status  → AIRLINE, ADMIN
+ * PATCH  /api/flights/{id}/gate    → AIRLINE, HANDLER, ADMIN
+ * GET    /api/flights/{id}/history → ADMIN
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/flights")
 public class FlightController {
 
     private final FlightService flightService;
 
-    public FlightController(FlightService flightService) {
-        this.flightService = flightService;
-    }
-
     @GetMapping
-    public ResponseEntity<?> getAllFlights() {
-        try {
-            return ResponseEntity.ok(flightService.getAllFlights());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body(Map.of("error", e.getMessage(), "cause",
-                            e.getCause() != null ? e.getCause().getMessage() : "brak"));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getAllFlights() throws Exception {
+        return ResponseEntity.ok(flightService.getAllFlights());
     }
 
     @GetMapping("/{flightId}")
-    public ResponseEntity<?> getFlight(@PathVariable String flightId) {
-        try {
-            return ResponseEntity.ok(flightService.getFlight(flightId));
-        } catch (Exception e) {
-            return ResponseEntity.status(404)
-                    .body(Map.of("error", e.getMessage()));
-        }
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> getFlight(@PathVariable String flightId) throws Exception {
+        return ResponseEntity.ok(flightService.getFlight(flightId));
     }
 
     @PostMapping
-    public ResponseEntity<?> createFlight(@RequestBody Map<String, String> body) {
-        try {
-            FlightData created = flightService.createFlight(
-                    body.get("flightId"), body.get("airline"),
-                    body.get("origin"),   body.get("destination"),
-                    body.get("gate"),     body.get("status"),
-                    body.get("scheduledDep")
-            );
-            return ResponseEntity.ok(created);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
+    @PreAuthorize("hasAnyRole('AIRLINE', 'ADMIN')")
+    public ResponseEntity<?> createFlight(@Valid @RequestBody CreateFlightRequest req) throws Exception {
+        return ResponseEntity.ok(flightService.createFlight(
+            req.getFlightId(), req.getAirline(),
+            req.getOrigin(),   req.getDestination(),
+            req.getGate(),     req.getStatus(),
+            req.getScheduledDep()
+        ));
     }
 
     @PatchMapping("/{flightId}/status")
-    public ResponseEntity<?> updateStatus(
-            @PathVariable String flightId,
-            @RequestBody Map<String, String> body) {
-        try {
-            return ResponseEntity.ok(
-                    flightService.updateStatus(flightId, body.get("status")));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
+    @PreAuthorize("hasAnyRole('AIRLINE', 'ADMIN')")
+    public ResponseEntity<?> updateStatus(@PathVariable String flightId, @Valid @RequestBody UpdateStatusRequest req) throws Exception {
+        return ResponseEntity.ok(flightService.updateStatus(flightId, req.getStatus()));
     }
 
     @PatchMapping("/{flightId}/gate")
-    public ResponseEntity<?> updateGate(
-            @PathVariable String flightId,
-            @RequestBody Map<String, String> body) {
-        try {
-            return ResponseEntity.ok(
-                    flightService.updateGate(flightId, body.get("gate")));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
+    @PreAuthorize("hasAnyRole('AIRLINE', 'HANDLER', 'ADMIN')")
+    public ResponseEntity<?> updateGate(@PathVariable String flightId, @Valid @RequestBody UpdateGateRequest req) throws Exception {
+        return ResponseEntity.ok(flightService.updateGate(flightId, req.getGate()));
     }
 
     @GetMapping("/{flightId}/history")
-    public ResponseEntity<?> getFlightHistory(@PathVariable String flightId) {
-        try {
-            return ResponseEntity.ok(flightService.getFlightHistory(flightId));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
-        }
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getFlightHistory(@PathVariable String flightId) throws Exception {
+        return ResponseEntity.ok(flightService.getFlightHistory(flightId));
     }
 }
