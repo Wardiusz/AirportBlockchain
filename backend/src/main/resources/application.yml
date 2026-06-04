@@ -5,7 +5,6 @@ server:
   port: ${SERVER_PORT:8080}
 
 fabric:
-  # Root of fabric-samples (contains test-network/). Override via FABRIC_SAMPLES_DIR or backend/.env
   samplesDir: ${FABRIC_SAMPLES_DIR:/home/wardiusz/Desktop/Projects/INZYNIERKA/AirportBlockchain/network/fabric-samples}
   usersDir: ${fabric.cryptoPath}/users
   channel: ${FABRIC_CHANNEL:airportchannel}
