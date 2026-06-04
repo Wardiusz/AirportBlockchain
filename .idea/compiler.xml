@@ -8,12 +8,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="AirportBlockchain-backend" />
+        <module name="chaincode" />
         <module name="backend" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="airport-cc" target="25" />
       <module name="AirportBlockchain" target="25" />
-      <module name="chaincode" target="25" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

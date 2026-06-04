@@ -10,10 +10,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.wardiusz</groupId>
-    <artifactId>AirportBlockchain-backend</artifactId>
+    <groupId>com.airportblockchain</groupId>
+    <artifactId>backend</artifactId>
     <version>1.0.0</version>
-    <name>AirportBlockchain-backend</name>
+    <name>airportblockchain</name>
     <description>This is a backend for the AirportBlockchain project.</description>
     <packaging>jar</packaging>
     <url/>
@@ -53,10 +53,8 @@
         <dependencies>
             <dependency>
                 <groupId>me.paulschwarz</groupId>
-                <artifactId>spring-dotenv-bom</artifactId>
+                <artifactId>spring-dotenv</artifactId>
                 <version>${dotenv.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -87,6 +85,19 @@
             <version>${jwt.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <!-- Hyperledger Fabric Chaincode Java Shim -->
         <dependency>
             <groupId>org.hyperledger.fabric-chaincode-java</groupId>
@@ -138,12 +149,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Dotenv (Spring Boot 4 auto-configuration; core spring-dotenv does not load .env) -->
         <dependency>
-            <groupId>me.paulschwarz</groupId>
-            <artifactId>springboot4-dotenv</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-
 
         <!-- Test -->
         <dependency>
@@ -151,6 +160,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 <!--    <build>-->
