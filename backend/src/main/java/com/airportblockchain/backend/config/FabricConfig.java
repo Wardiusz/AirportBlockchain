@@ -4,7 +4,9 @@ import io.grpc.ChannelCredentials;
 import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.TlsChannelCredentials;
+import org.hyperledger.fabric.client.Contract;
 import org.hyperledger.fabric.client.Gateway;
+import org.hyperledger.fabric.client.Network;
 import org.hyperledger.fabric.client.identity.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,15 +16,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
-import java.security.cert.CertificateException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 /**
- * FabricConfig — tworzy połączenie z siecią Hyperledger Fabric.
- *
- * Wszystkie ścieżki są czytane z application.yml,
- * który z kolei czyta wartości z pliku .env.
+ * Each identity has role in certification X.509 (Fabric CA),
  */
 @Configuration
 public class FabricConfig {
@@ -30,11 +30,8 @@ public class FabricConfig {
     @Value("${fabric.mspId}")
     private String mspId;
 
-    @Value("${fabric.certPath}")
-    private String certPath;
-
-    @Value("${fabric.keyPath}")
-    private String keyPath;
+    @Value("${fabric.usersDir}")
+    private String usersDir;
 
     @Value("${fabric.tlsCertPath}")
     private String tlsCertPath;
@@ -45,63 +42,82 @@ public class FabricConfig {
     @Value("${fabric.peerHostname}")
     private String peerHostname;
 
-    /**
-     * Gateway — główny punkt wejścia do sieci Fabric.
-     * Spring tworzy go raz przy starcie aplikacji (singleton).
-     */
+    @Value("${fabric.channel}")
+    private String channelName;
+
+    @Value("${fabric.chaincode}")
+    private String chaincodeName;
+
+    private static final Map<String, String> ROLE_TO_USER = Map.of(
+        "AIRLINE", "airlineuser@org1.example.com",
+        "HANDLER", "handleruser@org1.example.com",
+        "ADMIN",   "adminuser@org1.example.com"
+    );
+
     @Bean
-    public Gateway fabricGateway() throws IOException,
-            CertificateException,
-            InvalidKeyException {
-        // 1. Kanał gRPC z TLS do peera
+    public Map<String, Contract> roleContracts() throws Exception {
+        Map<String, Contract> contracts = new HashMap<>();
+
+        for (var entry : ROLE_TO_USER.entrySet()) {
+            String role = entry.getKey();
+            String userDir = entry.getValue();
+            String mspPath = usersDir + "/" + userDir + "/msp";
+
+            Gateway gateway = buildGateway(mspPath);
+            Network network = gateway.getNetwork(channelName);
+            contracts.put(role, network.getContract(chaincodeName));
+        }
+
+        return contracts;
+    }
+
+
+    private Gateway buildGateway(String mspPath) throws Exception {
         ManagedChannel grpcChannel = newGrpcChannel();
+        Identity identity = newIdentity(mspPath);
+        Signer signer = newSigner(mspPath);
 
-        // 2. Tożsamość użytkownika (certyfikat X.509)
-        Identity identity = newIdentity();
-
-        // 3. Klucz prywatny do podpisywania transakcji
-        Signer signer = newSigner();
-
-        // 4. Zbuduj Gateway i połącz
         return Gateway.newInstance()
                 .identity(identity)
                 .signer(signer)
                 .connection(grpcChannel)
-                .evaluateOptions(options -> options.withDeadlineAfter(5, TimeUnit.SECONDS))
-                .submitOptions(options  -> options.withDeadlineAfter(5, TimeUnit.SECONDS))
+                .evaluateOptions(o -> o.withDeadlineAfter(15, TimeUnit.SECONDS))
+                .submitOptions(o  -> o.withDeadlineAfter(15, TimeUnit.SECONDS))
                 .connect();
     }
 
-    // ── Metody pomocnicze ──────────────────────────────────────
-
     private ManagedChannel newGrpcChannel() throws IOException {
-        ChannelCredentials tlsCredentials = TlsChannelCredentials.newBuilder()
+        ChannelCredentials tls = TlsChannelCredentials.newBuilder()
                 .trustManager(Paths.get(tlsCertPath).toFile())
                 .build();
-
-        return Grpc.newChannelBuilder(peerEndpoint, tlsCredentials)
-                .overrideAuthority(peerHostname)  // wymagane przez Fabric TLS
+        return Grpc.newChannelBuilder(peerEndpoint, tls)
+                .overrideAuthority(peerHostname)
                 .build();
     }
 
-    private Identity newIdentity() throws IOException, CertificateException {
-        // Odczytaj certyfikat PEM użytkownika
-        var certReader = Files.newBufferedReader(Paths.get(certPath));
-        var certificate = Identities.readX509Certificate(certReader);
+    private Identity newIdentity(String mspPath) throws Exception {
+        Path certFile = firstFileIn(mspPath + "/signcerts");
+
+        var reader = Files.newBufferedReader(certFile);
+        var certificate = Identities.readX509Certificate(reader);
+
         return new X509Identity(mspId, certificate);
     }
 
-    private Signer newSigner() throws IOException, InvalidKeyException {
-        // Klucz prywatny jest w folderze keystore — pobierz pierwszy plik
-        Path keystoreDir = Paths.get(keyPath);
-        Path privateKeyFile = Files.list(keystoreDir)
-                .findFirst()
-                .orElseThrow(() -> new IOException(
-                        "Brak klucza prywatnego w: " + keyPath
-                ));
+    private Signer newSigner(String mspPath) throws Exception {
+        Path keyFile = firstFileIn(mspPath + "/keystore");
 
-        var keyReader = Files.newBufferedReader(privateKeyFile);
-        var privateKey = Identities.readPrivateKey(keyReader);
+        var reader = Files.newBufferedReader(keyFile);
+        var privateKey = Identities.readPrivateKey(reader);
+
         return Signers.newPrivateKeySigner(privateKey);
+    }
+
+    private Path firstFileIn(String dir) throws IOException {
+        try (Stream<Path> files = Files.list(Paths.get(dir))) {
+            return files.filter(Files::isRegularFile)
+                    .findFirst()
+                    .orElseThrow(() -> new IOException("Brak pliku w: " + dir));
+        }
     }
 }
