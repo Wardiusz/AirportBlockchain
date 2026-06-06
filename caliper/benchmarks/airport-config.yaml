@@ -1,0 +1,73 @@
+# ══════════════════════════════════════════════════════════════
+#  Caliper Benchmark Config — Airport Blockchain
+#
+#  Definiuje rundy testowe. Kazda runda:
+#    - uruchamia workers (rownolegle procesy generujace obciazenie)
+#    - wysyla transakcje wg zadanego Send Rate (rateControl)
+#    - Caliper mierzy Throughput, Latency, Success rate
+#
+#  Wyniki -> raport HTML (report.html)
+# ══════════════════════════════════════════════════════════════
+
+test:
+  name: airport-blockchain-benchmark
+  description: Benchmark wydajnosci - loty lotniskowe (zapis i odczyt)
+  workers:
+    number: 5          # liczba rownoleglych procesow generujacych obciazenie
+  rounds:
+
+    # ── RUNDA 1: ZAPIS przy stalym Send Rate 25 TPS ──────────
+    - label: create-flight-fixed-25tps
+      description: Tworzenie lotow przy stalym obciazeniu 25 TPS
+      txNumber: 250
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 25
+      workload:
+        module: workload/createFlight.js
+
+    # ── RUNDA 2: ZAPIS - szukanie maksymalnego throughputu ───
+    # rampup zwieksza Send Rate stopniowo az do nasycenia sieci
+    - label: create-flight-ramping
+      description: Tworzenie lotow ze wzrastajacym obciazeniem
+      txNumber: 500
+      rateControl:
+        type: linear-rate
+        opts:
+          startingTps: 10
+          finishingTps: 100
+      workload:
+        module: workload/createFlight.js
+
+    # ── RUNDA 3: ODCZYT pojedynczego lotu (wysoki TPS) ───────
+    - label: query-flight
+      description: Odczyt pojedynczego lotu
+      txNumber: 1000
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 200
+      workload:
+        module: workload/queryFlight.js
+
+    # ── RUNDA 4: ODCZYT wszystkich lotow ─────────────────────
+    - label: query-all-flights
+      description: Odczyt listy wszystkich lotow
+      txNumber: 500
+      rateControl:
+        type: fixed-rate
+        opts:
+          tps: 100
+      workload:
+        module: workload/queryAllFlights.js
+
+monitors:
+  resource:
+    - module: docker
+      options:
+        interval: 5
+        containers:
+          - peer0.org1.example.com
+          - peer0.org2.example.com
+          - orderer.example.com

@@ -1,0 +1,15 @@
+{
+  "name": "airport-caliper-benchmark",
+  "version": "1.0.0",
+  "description": "Benchmark wydajnosci blockchaina lotniskowego (Hyperledger Caliper)",
+  "private": true,
+  "scripts": {
+    "bind": "caliper bind --caliper-bind-sut fabric:2.4",
+    "benchmark": "caliper launch manager --caliper-workspace caliper --caliper-networkconfig networks/airport-network.yaml --caliper-benchconfig benchmarks/airport-config.yaml --caliper-flow-only-test --caliper-fabric-gateway-enabled"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.3",
+    "@hyperledger/caliper-cli": "0.6.0",
+    "@hyperledger/fabric-gateway": "^1.5.0"
+  }
+}

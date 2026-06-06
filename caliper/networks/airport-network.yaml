@@ -1,0 +1,23 @@
+name: Airport Blockchain Network
+version: "2.0.0"
+
+caliper:
+  blockchain: fabric
+
+channels:
+  - channelName: airportchannel
+    contracts:
+      - id: airport-cc
+
+organizations:
+  - mspid: Org1MSP
+    identities:
+      certificates:
+        - name: User1
+          clientPrivateKey:
+            path: /home/wardiusz/Desktop/Projects/INZYNIERKA/AirportBlockchain/network/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/keystore/a89b441ff112435b6e189c23a0deadbb40be42171f969b5fcc59187fcc339fdb_sk
+          clientSignedCert:
+            path: /home/wardiusz/Desktop/Projects/INZYNIERKA/AirportBlockchain/network/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/users/User1@org1.example.com/msp/signcerts/cert.pem
+    connectionProfile:
+      path: /home/wardiusz/Desktop/Projects/INZYNIERKA/AirportBlockchain/network/fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.yaml
+      discover: true
