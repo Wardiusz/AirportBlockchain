@@ -6,45 +6,23 @@ import org.hyperledger.fabric.contract.annotation.Property;
 /**
  * Model danych lotu przechowywany w ledgerze blockchain.
  * Każde pole jest niezmienialnie zapisywane przy każdej transakcji.
+ *
+ * @param status       ON_TIME | DELAYED | CANCELLED | BOARDING | DEPARTED
+ * @param scheduledDep ISO-8601: "2026-05-28T14:30:00Z"
+ * @param lastUpdated  ISO-8601 timestamp ostatniej zmiany
+ * @param updatedBy    rola która zmieniła: AIRLINE | HANDLER | ADMIN
  */
 @DataType
-public final class FlightData {
-
-    @Property
-    @JsonProperty("flightId")
-    private final String flightId;
-
-    @Property
-    @JsonProperty("airline")
-    private final String airline;
-
-    @Property
-    @JsonProperty("origin")
-    private final String origin;
-
-    @Property
-    @JsonProperty("destination")
-    private final String destination;
-
-    @Property
-    @JsonProperty("gate")
-    private final String gate;
-
-    @Property
-    @JsonProperty("status")
-    private final String status;       // ON_TIME | DELAYED | CANCELLED | BOARDING | DEPARTED
-
-    @Property
-    @JsonProperty("scheduledDep")
-    private final String scheduledDep; // ISO-8601: "2026-05-28T14:30:00Z"
-
-    @Property
-    @JsonProperty("lastUpdated")
-    private final String lastUpdated;  // ISO-8601 timestamp ostatniej zmiany
-
-    @Property
-    @JsonProperty("updatedBy")
-    private final String updatedBy;    // rola która zmieniła: AIRLINE | HANDLER | ADMIN
+public record FlightData(
+        @Property @JsonProperty("flightId") String flightId,
+        @Property @JsonProperty("airline") String airline,
+        @Property @JsonProperty("origin") String origin,
+        @Property @JsonProperty("destination") String destination,
+        @Property @JsonProperty("gate") String gate, @Property @JsonProperty("status") String status,
+        @Property @JsonProperty("scheduledDep") String scheduledDep,
+        @Property @JsonProperty("lastUpdated") String lastUpdated,
+        @Property @JsonProperty("updatedBy") String updatedBy
+) {
 
     // @JsonCreator mówi Jacksonowi żeby użył tego konstruktora przy deserializacji
     @JsonCreator
@@ -70,39 +48,48 @@ public final class FlightData {
         this.updatedBy = updatedBy;
     }
 
-    public String getFlightId() {
+    @Override
+    public String flightId() {
         return flightId;
     }
 
-    public String getAirline() {
+    @Override
+    public String airline() {
         return airline;
     }
 
-    public String getOrigin() {
+    @Override
+    public String origin() {
         return origin;
     }
 
-    public String getDestination() {
+    @Override
+    public String destination() {
         return destination;
     }
 
-    public String getGate() {
+    @Override
+    public String gate() {
         return gate;
     }
 
-    public String getStatus() {
+    @Override
+    public String status() {
         return status;
     }
 
-    public String getScheduledDep() {
+    @Override
+    public String scheduledDep() {
         return scheduledDep;
     }
 
-    public String getLastUpdated() {
+    @Override
+    public String lastUpdated() {
         return lastUpdated;
     }
 
-    public String getUpdatedBy() {
+    @Override
+    public String updatedBy() {
         return updatedBy;
     }
 }
