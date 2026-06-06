@@ -10,8 +10,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hyperledger.fabric.contract.annotation.*;
-
 
 /**
  * FlightContract — wszystkie metody zwracają String (JSON),
@@ -31,7 +29,7 @@ public final class FlightContract implements ContractInterface {
             "ON_TIME", "DELAYED", "CANCELLED", "BOARDING", "DEPARTED"
     );
 
-    // ── Inicjalizacja ──────────────────────────────────────────
+    // Inicjalizacja
 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public void initLedger(final Context ctx) {
@@ -40,17 +38,10 @@ public final class FlightContract implements ContractInterface {
         createFlight(ctx, "LH5678", "Lufthansa",           "WAW", "FRA", "C7",  "DELAYED", "2026-05-28T14:00:00Z");
     }
 
-    // ── Tworzenie lotu → zwraca String (JSON) ─────────────────
+    // Tworzenie lotu → zwraca String (JSON)
 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public String createFlight(final Context ctx,
-                               final String flightId,
-                               final String airline,
-                               final String origin,
-                               final String destination,
-                               final String gate,
-                               final String status,
-                               final String scheduledDep) {
+    public String createFlight(final Context ctx, final String flightId, final String airline, final String origin, final String destination, final String gate, final String status, final String scheduledDep) {
         String callerRole = getCallerRole(ctx);
         if (!callerRole.equals("AIRLINE") && !callerRole.equals("ADMIN")) {
             throw new ChaincodeException("Brak uprawnien: tylko AIRLINE lub ADMIN moze tworzyc loty", "UNAUTHORIZED");
@@ -77,12 +68,10 @@ public final class FlightContract implements ContractInterface {
         return json;
     }
 
-    // ── Aktualizacja statusu → zwraca String ──────────────────
+    // Aktualizacja statusu → zwraca String
 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public String updateStatus(final Context ctx,
-                               final String flightId,
-                               final String newStatus) {
+    public String updateStatus(final Context ctx, final String flightId, final String newStatus) {
         String callerRole = getCallerRole(ctx);
         if (!callerRole.equals("AIRLINE") && !callerRole.equals("ADMIN")) {
             throw new ChaincodeException("Brak uprawnien", "UNAUTHORIZED");
@@ -94,10 +83,10 @@ public final class FlightContract implements ContractInterface {
         String txTimestamp = ctx.getStub().getTxTimestamp().toString();
 
         FlightData updated = new FlightData(
-                existing.getFlightId(), existing.getAirline(),
-                existing.getOrigin(),   existing.getDestination(),
-                existing.getGate(),     newStatus,
-                existing.getScheduledDep(),
+                existing.flightId(), existing.airline(),
+                existing.origin(),   existing.destination(),
+                existing.gate(),     newStatus,
+                existing.scheduledDep(),
                 txTimestamp, callerRole
         );
 
@@ -107,12 +96,10 @@ public final class FlightContract implements ContractInterface {
         return json;
     }
 
-    // ── Aktualizacja bramki → zwraca String ───────────────────
+    // Aktualizacja bramki → zwraca String
 
     @Transaction(intent = Transaction.TYPE.SUBMIT)
-    public String updateGate(final Context ctx,
-                             final String flightId,
-                             final String newGate) {
+    public String updateGate(final Context ctx, final String flightId, final String newGate) {
         String callerRole = getCallerRole(ctx);
         if (!callerRole.equals("AIRLINE") && !callerRole.equals("HANDLER") && !callerRole.equals("ADMIN")) {
             throw new ChaincodeException("Brak uprawnien", "UNAUTHORIZED");
@@ -123,10 +110,10 @@ public final class FlightContract implements ContractInterface {
         String txTimestamp = ctx.getStub().getTxTimestamp().toString();
 
         FlightData updated = new FlightData(
-                existing.getFlightId(), existing.getAirline(),
-                existing.getOrigin(),   existing.getDestination(),
-                newGate,                existing.getStatus(),
-                existing.getScheduledDep(),
+                existing.flightId(), existing.airline(),
+                existing.origin(),   existing.destination(),
+                newGate,                existing.status(),
+                existing.scheduledDep(),
                 txTimestamp, callerRole
         );
 
@@ -136,14 +123,14 @@ public final class FlightContract implements ContractInterface {
         return json;
     }
 
-    // ── Odczyt pojedynczego lotu → zwraca String ──────────────
+    // Odczyt pojedynczego lotu → zwraca String
 
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String queryFlight(final Context ctx, final String flightId) {
         return serialize(getFlightOrThrow(ctx, flightId));
     }
 
-    // ── Odczyt wszystkich lotów → zwraca String (JSON array) ──
+    // Odczyt wszystkich lotów → zwraca String (JSON array)
 
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String queryAllFlights(final Context ctx) {
@@ -160,7 +147,7 @@ public final class FlightContract implements ContractInterface {
         return serialize(flights);
     }
 
-    // ── Historia zmian → zwraca String ────────────────────────
+    // Historia zmian → zwraca String
 
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String getFlightHistory(final Context ctx, final String flightId) {
@@ -182,7 +169,7 @@ public final class FlightContract implements ContractInterface {
         return "[" + String.join(",", records) + "]";
     }
 
-    // ── Metody pomocnicze ──────────────────────────────────────
+    // Metody pomocnicze
 
     private String getCallerRole(final Context ctx) {
         try {
