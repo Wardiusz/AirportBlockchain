@@ -63,8 +63,10 @@ public class FabricConfig {
             String userDir = entry.getValue();
             String mspPath = usersDir + "/" + userDir + "/msp";
 
-            Gateway gateway = buildGateway(mspPath);
-            Network network = gateway.getNetwork(channelName);
+            Network network;
+            try (Gateway gateway = buildGateway(mspPath)) {
+                network = gateway.getNetwork(channelName);
+            }
             contracts.put(role, network.getContract(chaincodeName));
         }
 
