@@ -1,5 +1,6 @@
-springdotenv:
-  directory: .
+dotenv:
+  directory: ..
+  ignore-if-missing: true
 
 server:
   port: ${SERVER_PORT:8080}
@@ -24,7 +25,3 @@ fabric:
 jwt:
   secret: ${JWT_SECRET}
   expirationMs: 28800000 # 8h
-
-spring:
-  application:
-    name: airport-blockchain-backend
