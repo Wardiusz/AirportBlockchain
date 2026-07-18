@@ -25,7 +25,7 @@ ORG1="$TEST_NET/organizations/peerOrganizations/org1.example.com"
 CA_TLS_CERT="$TEST_NET/organizations/fabric-ca/org1/ca-cert.pem"
 USERS_DIR="$ORG1/users"
 
-# Sprawdz czy CA dziala
+# Sprawdź czy CA działa
 echo -e "\n${YELLOW}[1/4] Sprawdzam Fabric CA...${NC}"
 if ! command -v fabric-ca-client &> /dev/null; then
   echo -e "${RED}BLAD: fabric-ca-client nie znaleziony w $FABRIC_DIR/bin${NC}"
@@ -67,7 +67,7 @@ register_user() {
 
   local MSP_DIR="$USERS_DIR/$NAME@org1.example.com/msp"
 
-  # Enroll — zadaj wlaczenia atrybutu role do certyfikatu
+  # Zadanie włączenia atrybutu role do certyfikatu
   fabric-ca-client enroll \
     -u "https://$NAME:$SECRET@localhost:7054" \
     --caname ca-org1 \
@@ -75,7 +75,7 @@ register_user() {
     --enrollment.attrs "role" \
     --tls.certfiles "$CA_TLS_CERT" >/dev/null 2>&1
 
-  # Skopiuj config.yaml (NodeOUs) zeby MSP byl poprawny
+  # Skopiowanie config.yaml (NodeOUs) żeby MSP był poprawny
   cp "$ORG1/msp/config.yaml" "$MSP_DIR/config.yaml" 2>/dev/null || true
 }
 
@@ -95,6 +95,10 @@ for u in airlineuser handleruser adminuser; do
   fi
 done
 
+TARGET_UID="$(id -u "${SUDO_USER:-$USER}")"
+TARGET_GID="$(id -g "${SUDO_USER:-$USER}")"
+sudo chown -R "$TARGET_UID:$TARGET_GID" "$TEST_NET/organizations/"
+
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}  OK Tozsamosci z rolami gotowe!        ${NC}"
 echo -e "${GREEN}========================================${NC}"
@@ -104,4 +108,3 @@ echo "    $USERS_DIR/airlineuser@org1.example.com/msp  (role=AIRLINE)"
 echo "    $USERS_DIR/handleruser@org1.example.com/msp  (role=HANDLER)"
 echo "    $USERS_DIR/adminuser@org1.example.com/msp    (role=ADMIN)"
 echo ""
-echo "  Teraz zaktualizuj application.yml (patrz README-ROLES.md)"
