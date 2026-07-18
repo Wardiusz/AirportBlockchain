@@ -13,10 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
- * Token has:
- *   sub  → username
- *   role → AIRLINE | HANDLER | ADMIN
- *   exp  → time expiraton (default 8h)
+ * Token ma:
+ *   sub:  username
+ *   role: AIRLINE | HANDLER | ADMIN
+ *   exp:  czas wygaśnięcia (normalnie 8h)
  */
 @Component
 public class JwtUtil {

@@ -7,6 +7,9 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Hardcodowane role (dla uproszczenia systemu, jako rozbudowę możliwe zastąpienie bazą danych)
+ */
 @Component
 public class InMemoryUserStore {
 
