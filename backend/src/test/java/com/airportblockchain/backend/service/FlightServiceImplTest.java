@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("FlightServiceImpl — testy jednostkowe (mock Fabric)")
+@DisplayName("FlightServiceImpl — testy jednostkowe")
 class FlightServiceImplTest {
 
     @Mock
@@ -51,8 +51,7 @@ class FlightServiceImplTest {
             """.formatted(flightId, gate, status)).getBytes(StandardCharsets.UTF_8);
     }
 
-    // ── DODAWANIE REKORDU ─────────────────────────────────────
-
+    //  DODAWANIE REKORDU
     @Test
     @DisplayName("createFlight wysyła transakcję 'createFlight' i zwraca lot")
     void createFlight_submitsTransactionAndReturnsFlight() throws Exception {
@@ -76,8 +75,7 @@ class FlightServiceImplTest {
                 "WAW", "JFK", "D5", "ON_TIME", "2026-05-29T18:00:00Z");
     }
 
-    // ── MODYFIKACJA STATUSU ───────────────────────────────────
-
+    //  MODYFIKACJA STATUSU 
     @Test
     @DisplayName("updateStatus zmienia status lotu na DELAYED")
     void updateStatus_changesStatus() throws Exception {
@@ -90,8 +88,7 @@ class FlightServiceImplTest {
         verify(contract).submitTransaction("updateStatus", "LO100", "DELAYED");
     }
 
-    // ── MODYFIKACJA BRAMKI ────────────────────────────────────
-
+    //  MODYFIKACJA BRAMKI 
     @Test
     @DisplayName("updateGate zmienia bramkę lotu")
     void updateGate_changesGate() throws Exception {
@@ -104,8 +101,7 @@ class FlightServiceImplTest {
         verify(contract).submitTransaction("updateGate", "LO100", "C12");
     }
 
-    // ── ODCZYT POJEDYNCZEGO LOTU ──────────────────────────────
-
+    //  ODCZYT POJEDYNCZEGO LOTU 
     @Test
     @DisplayName("getFlight pobiera lot przez evaluateTransaction")
     void getFlight_returnsFlight() throws Exception {
@@ -118,8 +114,7 @@ class FlightServiceImplTest {
         verify(contract).evaluateTransaction("queryFlight", "LO100");
     }
 
-    // ── ODCZYT WSZYSTKICH LOTÓW ───────────────────────────────
-
+    //  ODCZYT WSZYSTKICH LOTÓW 
     @Test
     @DisplayName("getAllFlights parsuje listę lotów")
     void getAllFlights_returnsList() throws Exception {
