@@ -11,11 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * FlightContract — wszystkie metody zwracają String (JSON),
- * bo Fabric shim serializuje zwracane obiekty Gensonem (nie Jacksonem).
- * Spring Boot deserializuje String → obiekt po swojej stronie.
- */
 @Contract(name = "FlightContract",
         info = @Info(title = "Airport Flight Contract",
                 description = "System bezpiecznego udostepniania danych lotow",
@@ -30,7 +25,6 @@ public final class FlightContract implements ContractInterface {
     );
 
     // Inicjalizacja
-
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public void initLedger(final Context ctx) {
         createFlight(ctx, "LOT101", "LOT Polish Airlines", "WAW", "LHR", "B12", "ON_TIME", "2026-05-28T10:00:00Z");
@@ -39,7 +33,6 @@ public final class FlightContract implements ContractInterface {
     }
 
     // Tworzenie lotu → zwraca String (JSON)
-
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String createFlight(final Context ctx, final String flightId, final String airline, final String origin, final String destination, final String gate, final String status, final String scheduledDep) {
         String callerRole = getCallerRole(ctx);
@@ -69,7 +62,6 @@ public final class FlightContract implements ContractInterface {
     }
 
     // Aktualizacja statusu → zwraca String
-
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String updateStatus(final Context ctx, final String flightId, final String newStatus) {
         String callerRole = getCallerRole(ctx);
@@ -97,7 +89,6 @@ public final class FlightContract implements ContractInterface {
     }
 
     // Aktualizacja bramki → zwraca String
-
     @Transaction(intent = Transaction.TYPE.SUBMIT)
     public String updateGate(final Context ctx, final String flightId, final String newGate) {
         String callerRole = getCallerRole(ctx);
@@ -124,14 +115,12 @@ public final class FlightContract implements ContractInterface {
     }
 
     // Odczyt pojedynczego lotu → zwraca String
-
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String queryFlight(final Context ctx, final String flightId) {
         return serialize(getFlightOrThrow(ctx, flightId));
     }
 
     // Odczyt wszystkich lotów → zwraca String (JSON array)
-
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String queryAllFlights(final Context ctx) {
         QueryResultsIterator<KeyValue> results =
@@ -148,7 +137,6 @@ public final class FlightContract implements ContractInterface {
     }
 
     // Historia zmian → zwraca String
-
     @Transaction(intent = Transaction.TYPE.EVALUATE)
     public String getFlightHistory(final Context ctx, final String flightId) {
         String callerRole = getCallerRole(ctx);
@@ -170,7 +158,6 @@ public final class FlightContract implements ContractInterface {
     }
 
     // Metody pomocnicze
-
     private String getCallerRole(final Context ctx) {
         try {
             String role = ctx.getClientIdentity().getAttributeValue("role");
