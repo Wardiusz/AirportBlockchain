@@ -1,13 +1,5 @@
----
-# ══════════════════════════════════════════════════════════════
 #  Connection Profile — Airport Blockchain
-#  Używany przez Spring Boot (Fabric Gateway SDK) do połączenia
-#  z siecią Hyperledger Fabric (test-network).
-#
 #  Ścieżki certyfikatów są względne do ~/fabric-samples/test-network
-#  Podmień HOME_DIR na absolutną ścieżkę swojego użytkownika,
-#  np. /home/jan lub /Users/jan (macOS)
-# ══════════════════════════════════════════════════════════════
 
 name: airport-network
 version: "1.0"
@@ -21,7 +13,7 @@ client:
         endorser: 300
       orderer: 300
 
-# ── Kanał ─────────────────────────────────────────────────────
+#  Kanał 
 channels:
   airportchannel:
     orderers:
@@ -38,7 +30,7 @@ channels:
         ledgerQuery: true
         eventSource: false
 
-# ── Organizacje ───────────────────────────────────────────────
+#  Organizacje 
 organizations:
   Org1:
     mspid: Org1MSP
@@ -59,7 +51,7 @@ organizations:
     certificateAuthorities:
       - ca.org2.example.com
 
-# ── Orderer ───────────────────────────────────────────────────
+#  Orderer 
 orderers:
   orderer.example.com:
     url: grpcs://localhost:7050
@@ -70,7 +62,7 @@ orderers:
     tlsCACerts:
       path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
-# ── Peery ────────────────────────────────────────────────────
+#  Peery 
 peers:
   peer0.org1.example.com:
     url: grpcs://localhost:7051
@@ -88,7 +80,7 @@ peers:
     tlsCACerts:
       path: ${FABRIC_SAMPLES_DIR}/test-network/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 
-# ── Certificate Authorities ───────────────────────────────────
+#  Certificate Authorities 
 certificateAuthorities:
   ca.org1.example.com:
     url: https://localhost:7054
