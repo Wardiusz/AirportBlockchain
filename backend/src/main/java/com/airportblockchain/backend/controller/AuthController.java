@@ -8,9 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-/**
- * POST /api/auth/login
- */
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")

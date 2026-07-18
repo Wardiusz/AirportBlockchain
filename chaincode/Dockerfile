@@ -1,8 +1,4 @@
-# -------------------------------------------------------------------
 #  Dockerfile - Chaincode as a Service (CCaaS)
-#  Builds chaincode as a standalone gRPC service.
-#  Peers connect to this service instead of building their own image.
-# -------------------------------------------------------------------
 
 # Step 1: Building JAR using Gradle
 FROM gradle:jdk25 AS build

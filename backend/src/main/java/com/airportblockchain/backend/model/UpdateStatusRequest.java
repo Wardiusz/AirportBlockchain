@@ -5,7 +5,9 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-/** DTO dla PATCH /api/flights/{id}/status */
+/**
+ * DTO dla PATCH /api/flights/{id}/status
+ * */
 @Setter
 @Getter
 public class UpdateStatusRequest {

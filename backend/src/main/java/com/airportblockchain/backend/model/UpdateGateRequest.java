@@ -5,7 +5,9 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-/** DTO dla PATCH /api/flights/{id}/gate */
+/**
+ * DTO dla PATCH /api/flights/{id}/gate
+ * */
 @Setter
 @Getter
 public class UpdateGateRequest {
