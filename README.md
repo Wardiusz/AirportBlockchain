@@ -279,4 +279,4 @@ they disappear once stopped and must be started again with the same `CHAINCODE_I
 that `start.sh` printed during deployment.
 
 ## License
-
+This project is licensed under the GPL-3.0 License.
